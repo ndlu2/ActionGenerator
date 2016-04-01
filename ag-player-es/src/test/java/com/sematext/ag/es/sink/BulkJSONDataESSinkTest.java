@@ -34,9 +34,12 @@ public class BulkJSONDataESSinkTest extends TestCase {
     event.addPair("category", "it");
     List<SimpleDataEvent> events = new ArrayList<SimpleDataEvent>(1);
     events.add(event);
+    String[] data = sink.getBulkData(events).split("\n");
+    assertEquals("{\"index\":{\"_index\":\"test\",\"_type\":\"doc\",\"_id\":\"1\"}}", data[0]);
+    assertTrue(data[1].contains("\"category\":\"it\""));
+    assertTrue(data[1].contains("\"name\":\"abc\""));
 
-    assertEquals(
-        "{\"index\":{\"_index\":\"test\",\"_type\":\"doc\",\"_id\":\"1\"}}\n{\"category\":\"it\",\"name\":\"abc\"}\n",
-        sink.getBulkData(events));
+    //Test to see if the data contains exactly one copy of each pair
+    assertEquals("{,}", data[1].replaceFirst("\"category\":\"it\"", "").replaceFirst("\"name\":\"abc\"", ""));
   }
 }
